@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "hyperliquid": {
+      "command": "uvx",
+      "args": ["hyperliquid-mcp"],
+      "env": {
+        "HL_WALLET_ADDRESS": "0xYourWalletAddressHere"
+      }
+    }
+  }
+}

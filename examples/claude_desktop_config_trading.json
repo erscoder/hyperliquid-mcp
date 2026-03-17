@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "hyperliquid": {
+      "command": "uvx",
+      "args": ["hyperliquid-mcp"],
+      "env": {
+        "HL_PRIVATE_KEY": "0xYourPrivateKeyHere"
+      }
+    }
+  }
+}
