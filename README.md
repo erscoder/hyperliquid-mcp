@@ -129,7 +129,76 @@ Then in `claude_desktop_config.json`:
 
 ---
 
-## 🤖 Other MCP Clients
+## 🤖 Use in AI Agents
+
+MCP is not just for chat clients. Use hyperliquid-mcp as the trading layer inside any autonomous agent.
+
+### LangChain / LangGraph
+
+```python
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+client = MultiServerMCPClient({
+    "hyperliquid": {
+        "command": "uvx",
+        "args": ["hyperliquid-mcp"],
+        "transport": "stdio",
+        "env": {"HL_WALLET_ADDRESS": "0xYourWallet"}
+    }
+})
+
+tools = await client.get_tools()
+# tools now includes hl_get_user_state, hl_get_orderbook, etc.
+# Pass them to any LangChain agent or LangGraph node
+```
+
+### CrewAI
+
+```python
+from crewai import Agent
+from crewai_tools import MCPTool
+
+hl_tools = MCPTool.from_server(
+    command="uvx",
+    args=["hyperliquid-mcp"],
+    env={"HL_WALLET_ADDRESS": "0xYourWallet"}
+)
+
+trader = Agent(
+    role="Trading Analyst",
+    goal="Monitor Hyperliquid positions and funding rates",
+    tools=hl_tools
+)
+```
+
+### Custom agent (MCP Python SDK)
+
+```python
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+server_params = StdioServerParameters(
+    command="uvx",
+    args=["hyperliquid-mcp"],
+    env={"HL_WALLET_ADDRESS": "0xYourWallet"}
+)
+
+async with stdio_client(server_params) as (read, write):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+        result = await session.call_tool("hl_get_user_state", {})
+        print(result.content)
+```
+
+**Agent ideas:**
+- Portfolio monitor that alerts when funding rates spike above threshold
+- Risk manager that auto-closes positions when drawdown exceeds limit
+- Arbitrage scanner comparing funding across assets
+- Morning briefing agent that summarizes overnight PnL and open positions
+
+---
+
+## 💬 Other MCP Clients
 
 Works with any MCP-compatible client:
 
